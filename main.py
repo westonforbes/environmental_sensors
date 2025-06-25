@@ -41,7 +41,7 @@ def setup_graphics():
     label_temp = Widgets.Label("Temperature: -- F", 10, 50, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
 
     # Create t_adjust label.
-    label_t_adjustment = Widgets.Label("Temperature Adjustment: {t_adjustment:0.1f} F", 10, 70, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
+    label_t_adjustment = Widgets.Label(f"Temperature Adjustment: {t_adjustment:0.1f} F", 10, 70, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
     
     # Create humidity label.
     label_humidity = Widgets.Label("Humidity: -- %", 10, 90, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
@@ -70,6 +70,8 @@ def setup_sensor():
 
 
 def calculate_heat_index(temp_f, humidity):
+
+    # https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
     
     # Simple formula for initial calculation.
     simple_hi = 0.5 * (temp_f + 61.0 + ((temp_f - 68.0) * 1.2) + (humidity * 0.094))
