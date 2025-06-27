@@ -1,3 +1,20 @@
+# Configuration area.#######################################################################
+
+# Sensor Name
+SENSOR_NAME = "SENSOR_001"
+
+# Temperature adjustment to known standard.
+T_ADJUSTMENT = 0.0
+
+# Humidity adjustment to known standard.
+H_ADJUSTMENT = 0.0
+
+# API endpoint.
+API_ENDPOINT = "http://www.forbes-server.com:8000/heat_index_data"
+
+############################################################################################
+
+
 import os, sys, io
 import M5
 from M5 import *
@@ -17,8 +34,6 @@ label_status = None
 label_network = None
 label_countdown = None
 dht22_sensor = None
-t_adjustment = 0.0
-h_adjustment = 0.0
 label_t_adjustment = None
 label_h_adjustment = None
 
@@ -29,8 +44,7 @@ post_counter = 0
 post_interval = 33 # Approximately 10 seconds.
 sensor_interval = 10 # Approximately 3 seconds.
 
-# Network and API configuration.
-API_ENDPOINT = "http://www.forbes-server.com:8000/data"
+
 
 # Store last successful readings for POST.
 last_temp_f = None
@@ -55,13 +69,13 @@ def setup_graphics():
     label_temp = Widgets.Label("Temperature: -- F", 10, 50, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
 
     # Create t_adjust label.
-    label_t_adjustment = Widgets.Label("Temperature Adjustment: {t_adjustment:0.1f} F", 10, 70, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
+    label_t_adjustment = Widgets.Label("Temperature Adjustment: {T_ADJUSTMENT:0.1f} F", 10, 70, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
     
     # Create humidity label.
     label_humidity = Widgets.Label("Humidity: -- %", 10, 90, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
 
     # Create h_adjust label.
-    label_h_adjustment = Widgets.Label(f"Humidity Adjustment: {h_adjustment:0.1f} %", 10, 110, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
+    label_h_adjustment = Widgets.Label(f"Humidity Adjustment: {H_ADJUSTMENT:0.1f} %", 10, 110, 1.0, 0xffffff, 0x222222, Widgets.FONTS.DejaVu12)
     
     # Create heat index label.
     label_heat_index = Widgets.Label("Heat Index: -- F", 10, 130, 1.0, 0xff8800, 0x222222, Widgets.FONTS.DejaVu12)
@@ -175,11 +189,11 @@ def post_sensor_data(temp_f, humidity, heat_index_f):
     try:
         # Prepare the data payload
         payload = {
-            "name": "environmental_sensor_data",
+            "name": SENSOR_NAME,
             "temperature_f": round(temp_f, 1),
-            "temperature_f_offset": round(t_adjustment, 1),
+            "temperature_f_offset": round(T_ADJUSTMENT, 1),
             "humidity_percentage": round(humidity, 1),
-            "humidity_percentage_offset": round(h_adjustment, 1),
+            "humidity_percentage_offset": round(H_ADJUSTMENT, 1),
             "heat_index_f": round(heat_index_f, 1)
         }
         
@@ -219,7 +233,7 @@ def post_sensor_data(temp_f, humidity, heat_index_f):
 def read_dht22():
 
     # Set up global connections.
-    global dht22_sensor, label_temp, label_humidity, label_heat_index, label_status, label_t_adjustment, label_h_adjustment, t_adjustment, h_adjustment
+    global dht22_sensor, label_temp, label_humidity, label_heat_index, label_status, label_t_adjustment, label_h_adjustment
     global last_temp_f, last_humidity, last_heat_index
     
     # Check if the sensor is not initialized...
@@ -246,8 +260,8 @@ def read_dht22():
         temp_f = (temp_c * 9.0 / 5.0) + 32.0
 
         # Add adjustments.
-        temp_f = temp_f + t_adjustment
-        humidity = humidity + h_adjustment
+        temp_f = temp_f + T_ADJUSTMENT
+        humidity = humidity + H_ADJUSTMENT
 
         # Calculate heat index.
         heat_index_f = calculate_heat_index(temp_f, humidity)
@@ -262,9 +276,9 @@ def read_dht22():
         
         # Update labels with new readings.
         label_temp.setText(f"Temperature: {temp_f:.1f} F")
-        label_t_adjustment.setText(f"Temperature Adjustment: {t_adjustment:.1f} F")
+        label_t_adjustment.setText(f"Temperature Adjustment: {T_ADJUSTMENT:.1f} F")
         label_humidity.setText(f"Humidity: {humidity:.1f} %")
-        label_h_adjustment.setText(f"Humidity Adjustment: {h_adjustment:.1f} %")
+        label_h_adjustment.setText(f"Humidity Adjustment: {H_ADJUSTMENT:.1f} %")
         label_heat_index.setText(f"Heat Index: {heat_index_f:.1f} F ({hi_description})")
         label_heat_index.setColor(hi_color, 0x222222)
         
